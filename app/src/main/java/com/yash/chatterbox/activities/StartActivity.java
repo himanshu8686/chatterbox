@@ -23,9 +23,14 @@ import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.yash.chatterbox.R;
+import com.yash.chatterbox.model.User;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,14 +44,13 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private PinView pinView;
 
     private FirebaseAuth firebaseAuth;
-
-    private String verificationID,codeFromServer,phoneNumber;
+    private DatabaseReference databaseReference;
+    private String verificationID,codeFromServer,phoneNumber,userName;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        getSupportActionBar().hide();
         initializeViews();
     }
 
@@ -81,10 +85,10 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser()!=null)
         {
-            finish();
             Intent intent =new Intent(this,MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
         }
     }
     @Override
@@ -118,10 +122,10 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
      */
     private void firstFormProcessing()
     {
-        String name=et_userName.getText().toString();
+       userName=et_userName.getText().toString();
         phoneNumber="+91"+et_phoneNumber.getText().toString();
 
-        if (TextUtils.isEmpty(name))
+        if (TextUtils.isEmpty(userName))
         {
             et_userName.setError("Name can't be empty");
             et_userName.requestFocus();
@@ -133,8 +137,9 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             et_phoneNumber.requestFocus();
             return;
         }
-        if (!TextUtils.isEmpty(name) && phoneNumber.length()==13)
+        if (!TextUtils.isEmpty(userName) && phoneNumber.length()==13)
         {
+
             next_btn.setText("Verify");
             firstLayout.setVisibility(View.GONE);
             secondOTPLayout.setVisibility(View.VISIBLE);
@@ -155,7 +160,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         {
             Toast.makeText(this, "No auto verification enter manually", Toast.LENGTH_SHORT).show();
             PhoneAuthCredential credential=PhoneAuthProvider.getCredential(verificationID,OTP);
-            signInWithPhoneCredentials(credential);
+            signInWithPhoneCredentials(credential,userName);
 
             pinView.setLineColor(Color.GREEN);
             tv_otp_msg.setText("OTP Verified");
@@ -196,7 +201,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                             next_btn.setText("Next");
 
                             PhoneAuthCredential credential=PhoneAuthProvider.getCredential(verificationID,codeFromServer);
-                            signInWithPhoneCredentials(credential);
+                            signInWithPhoneCredentials(credential, userName);
                         }
                         else {
                             Toast.makeText(StartActivity.this, "No otp received ", Toast.LENGTH_SHORT).show();
@@ -233,7 +238,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private void signInWithPhoneCredentials(PhoneAuthCredential credential)
+    private void signInWithPhoneCredentials(PhoneAuthCredential credential, final String userName)
     {
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -242,12 +247,33 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 Log.e("method X","onComplete called of fb");
                 if (task.isSuccessful())
                 {
-                    Intent intent=new Intent(StartActivity.this,MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    FirebaseUser firebaseUser=firebaseAuth.getCurrentUser();
+                    String userId=firebaseUser.getUid();
+                    //we will store additional fields in firebase database
+                    User user=new User(userId,userName,"default");
+                    databaseReference= FirebaseDatabase.getInstance().getReference("Users").child(userId);
+                    databaseReference.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                            {
+                                Toast.makeText(StartActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent(StartActivity.this,MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    });
                 }
                 else {
-                    Toast.makeText(StartActivity.this, "Exception while sign in"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    if (task.getException() instanceof FirebaseAuthUserCollisionException)
+                    {
+                        Toast.makeText(StartActivity.this, "User already registered!!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(StartActivity.this, "Exception while sign in"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
