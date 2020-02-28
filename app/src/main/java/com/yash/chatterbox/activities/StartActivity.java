@@ -57,7 +57,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onResume() {
         super.onResume();
-
         firebaseAuth=firebaseAuth.getInstance();
     }
 
@@ -233,6 +232,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         Log.e("method3 called ","onCodeSent");
                         super.onCodeSent(s, forceResendingToken);
                         verificationID=s;
+                        progress_circular.setVisibility(View.GONE);
+                        next_btn.setVisibility(View.VISIBLE);
                     }
                 });
     }

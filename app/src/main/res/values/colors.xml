@@ -6,4 +6,5 @@
 
     <color name="toolbar_background">#7C4DFF</color>
     <color name="white">#fff</color>
+    <color name="user_itm_color">#dfe6e9</color>
 </resources>

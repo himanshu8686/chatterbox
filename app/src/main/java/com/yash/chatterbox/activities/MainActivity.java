@@ -3,6 +3,7 @@ package com.yash.chatterbox.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar toolbar_layout;
     private TabLayout tab_layout;
     private ViewPager view_pager;
+    private  ViewPagerAdapter viewPagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -51,13 +54,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setUpViewPager();
 
+
     }
 
     /**
      * This setUpViewPager() method is user defined method for placing view pager adapter in view
      */
     private void setUpViewPager() {
-        ViewPagerAdapter viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
         viewPagerAdapter.addFragment(new UsersFragment(),"Users");
         view_pager.setAdapter(viewPagerAdapter);
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar_layout=findViewById(R.id.toolbar_layout);
         tab_layout=findViewById(R.id.tab_layout);
         view_pager  = findViewById(R.id.view_pager);
+
     }
 
     @Override
