@@ -92,6 +92,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     protected void onResume() {
         super.onResume();
         showUserDetailOnToolbar();
+        status("online");
     }
 
     private void showUserDetailOnToolbar() {
@@ -159,6 +160,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
+
+
     @Override
     public void onClick(View v) {
         if (v==btn_send)
@@ -172,5 +175,20 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
             text_send.setText("");
         }
+    }
+
+    private void status(String status)
+    {
+        databaseReference=FirebaseDatabase.getInstance().getReference("Users")
+                .child(firebaseUser.getUid());
+        HashMap<String,Object> hashMap=new HashMap<>();
+        hashMap.put("status",status);
+        databaseReference.updateChildren(hashMap);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
     }
 }

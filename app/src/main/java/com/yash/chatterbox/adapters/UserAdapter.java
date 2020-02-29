@@ -24,10 +24,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
 {
     private Context mContext;
     private List<User> userList;
+    private boolean isChat;
 
-    public UserAdapter(Context mContext, List<User> userList) {
+    public UserAdapter(Context mContext, List<User> userList,boolean isChat) {
         this.mContext = mContext;
         this.userList = userList;
+        this.isChat=isChat;
     }
 
     @NonNull
@@ -54,6 +56,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
         else {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
+
+        if (isChat)
+        {
+            if (user.getStatus().equals("online"))
+            {
+                holder.img_on.setVisibility(View.VISIBLE);
+                holder.img_off.setVisibility(View.GONE);
+            }
+            else {
+                holder.img_on.setVisibility(View.GONE);
+                holder.img_off.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            holder.img_on.setVisibility(View.GONE);
+            holder.img_off.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +93,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
     {
 
         public TextView tv_userName;
-        public CircleImageView profile_image;
+        public CircleImageView profile_image,img_on,img_off;
 
         public MyViewHolder(@NonNull View itemView)
         {
@@ -81,6 +101,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
             Log.e("inside my view holder","called");
             tv_userName= itemView.findViewById(R.id.tv_userName);
             profile_image=itemView.findViewById(R.id.profile_image);
+            img_on=itemView.findViewById(R.id.img_on);
+            img_off=itemView.findViewById(R.id.img_off);
+
         }
     }
 }

@@ -27,6 +27,8 @@ import com.yash.chatterbox.fragments.ProfileFragment;
 import com.yash.chatterbox.fragments.UsersFragment;
 import com.yash.chatterbox.model.User;
 
+import java.util.HashMap;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -143,5 +145,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v)
     {
 
+    }
+
+    private void status(String status)
+    {
+        databaseReference=FirebaseDatabase.getInstance().getReference("Users")
+                .child(firebaseUser.getUid());
+        HashMap<String,Object> hashMap=new HashMap<>();
+        hashMap.put("status",status);
+        databaseReference.updateChildren(hashMap);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
     }
 }

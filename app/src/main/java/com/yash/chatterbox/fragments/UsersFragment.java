@@ -72,13 +72,13 @@ public class UsersFragment extends Fragment
                         userList.add(user);
                     }
                     else if (userList.size()==0){
-                        Toast.makeText(getContext(), "No users", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getContext(), "No users", Toast.LENGTH_SHORT).show();
                     }
                 }
                 // set in adapter
                 Log.e("setting adapter","done");
                 System.out.println(userList);
-                userAdapter=new UserAdapter(getContext(),userList);
+                userAdapter=new UserAdapter(getContext(),userList,false);
                 user_recycler_view.setAdapter(userAdapter);
                 Log.e("adapter ","setted");
             }
