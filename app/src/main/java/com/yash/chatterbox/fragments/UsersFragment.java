@@ -59,7 +59,7 @@ public class UsersFragment extends Fragment
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
-                //userList.clear();
+                userList.clear();
                 for (DataSnapshot snapshot:dataSnapshot.getChildren())
                 {
                     User user=snapshot.getValue(User.class);

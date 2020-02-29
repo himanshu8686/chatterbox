@@ -214,6 +214,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                     {
                         Log.e("method2 called ","onVerificationFailed");
                         Toast.makeText(StartActivity.this, "verification failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        System.out.println("ERRR :"+e.getMessage());
                         progress_circular.setVisibility(View.GONE);
                         next_btn.setVisibility(View.VISIBLE);
                     }
@@ -273,14 +274,10 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         Toast.makeText(StartActivity.this, "User already registered!!", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(StartActivity.this, "Exception while sign in"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StartActivity.this, "Exception while sign in"+task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             }
         });
     }
-
-
-
-
 }

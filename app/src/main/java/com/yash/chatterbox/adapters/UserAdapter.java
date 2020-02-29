@@ -1,6 +1,7 @@
 package com.yash.chatterbox.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.yash.chatterbox.R;
+import com.yash.chatterbox.activities.MessageActivity;
 import com.yash.chatterbox.model.User;
 
 import java.util.List;
@@ -42,7 +44,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position)
     {
         Log.e("onBindViewHolder","called");
-        User user= userList.get(position);
+        final User user= userList.get(position);
         Log.e("User",""+user.getId()+user.getUserName());
         holder.tv_userName.setText(user.getUserName());
         if (user.getImageUrl().equals("default"))
@@ -52,6 +54,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
         else {
             Glide.with(mContext).load(user.getImageUrl()).into(holder.profile_image);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mContext, MessageActivity.class);
+                intent.putExtra("userId",user.getId());
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

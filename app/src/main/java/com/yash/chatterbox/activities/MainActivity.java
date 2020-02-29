@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
+
                 User user=dataSnapshot.getValue(User.class);
                 tv_userName.setText(user.getUserName());
                 if (user.getImageUrl().equals("default"))
