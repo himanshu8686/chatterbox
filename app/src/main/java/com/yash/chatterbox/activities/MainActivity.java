@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.yash.chatterbox.R;
 import com.yash.chatterbox.adapters.ViewPagerAdapter;
 import com.yash.chatterbox.fragments.ChatsFragment;
+import com.yash.chatterbox.fragments.ProfileFragment;
 import com.yash.chatterbox.fragments.UsersFragment;
 import com.yash.chatterbox.model.User;
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
         viewPagerAdapter.addFragment(new UsersFragment(),"Users");
+        viewPagerAdapter.addFragment(new ProfileFragment(),"Profile");
         view_pager.setAdapter(viewPagerAdapter);
         tab_layout.setupWithViewPager(view_pager);
     }
