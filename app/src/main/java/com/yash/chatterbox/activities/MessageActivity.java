@@ -9,6 +9,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,6 +49,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private MessageAdapter messageAdapter;
     private List<Chat> chatList;
     private RecyclerView message_recycler_view;
+     ValueEventListener seenListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -69,35 +71,37 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         message_recycler_view=findViewById(R.id.message_recycler_view);
         message_recycler_view.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setStackFromEnd(true);
         message_recycler_view.setLayoutManager(linearLayoutManager);
-
 
 
         profile_image= findViewById(R.id.profile_image);
         tv_userName=findViewById(R.id.tv_userName);
         text_send=findViewById(R.id.text_send);
+        btn_send=findViewById(R.id.btn_send);
 
         intent=getIntent();
+
         userId=intent.getStringExtra("userId");
 
         firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        btn_send.setOnClickListener(this);
         databaseReference= FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
-        btn_send=findViewById(R.id.btn_send);
-        btn_send.setOnClickListener(this);
+        showUserDetailOnToolbar();
+       seenMessage(userId);
+
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        showUserDetailOnToolbar();
+     //   Log.e("onResumeOf Message Act","called");
         status("online");
     }
 
     private void showUserDetailOnToolbar() {
-
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -108,7 +112,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     profile_image.setImageResource(R.drawable.userphoto);
                 }
                 else {
-                    Glide.with(MessageActivity.this).load(user.getImageUrl()).placeholder(R.drawable.userphoto).into(profile_image);
+                    Glide.with(getApplicationContext()).load(user.getImageUrl()).placeholder(R.drawable.userphoto).into(profile_image);
                 }
 
                 readMessage(firebaseUser.getUid(),userId,user.getImageUrl());
@@ -129,8 +133,33 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         hashMap.put("sender",sender);
         hashMap.put("receiver",receiver);
         hashMap.put("message",message);
-
+        hashMap.put("isSeen",false);
         reference.child("Chats").push().setValue(hashMap);
+    }
+
+    private void seenMessage(final String userId)
+    {
+        databaseReference=FirebaseDatabase.getInstance().getReference("Chats");
+        seenListener=databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot:dataSnapshot.getChildren())
+                {
+                    Chat chat=snapshot.getValue(Chat.class);
+                    if(chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId))
+                    {
+                        HashMap<String,Object> hashMap=new HashMap<>();
+                        hashMap.put("isSeen",true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void readMessage(final String myId, final String userId, final String imageUrl){
@@ -186,9 +215,12 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         databaseReference.updateChildren(hashMap);
     }
 
+
+
     @Override
     protected void onPause() {
         super.onPause();
+        databaseReference.removeEventListener(seenListener);
         status("offline");
     }
 }

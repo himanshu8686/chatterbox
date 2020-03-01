@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
 
-                    Glide.with(MainActivity.this).load(user.getImageUrl()).placeholder(R.drawable.userphoto).into(profile_image);
+                    Glide.with(getApplicationContext()).load(user.getImageUrl()).placeholder(R.drawable.userphoto).into(profile_image);
                 }
 
             }

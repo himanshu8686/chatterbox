@@ -121,7 +121,7 @@ public class UsersFragment extends Fragment
                         User user = snapshot.getValue(User.class);
                         assert firebaseUser != null;
                         String id = firebaseUser.getUid();
-                        Log.e("user id ", id);
+                   //     Log.e("user id ", id);
                         assert user != null;
                         if (!user.getId().equals(id)) {
                             userList.add(user);
@@ -130,11 +130,11 @@ public class UsersFragment extends Fragment
                         }
                     }
                     // set in adapter
-                    Log.e("setting adapter", "done");
+                   // Log.e("setting adapter", "done");
                     System.out.println(userList);
                     userAdapter = new UserAdapter(getContext(), userList, false);
                     user_recycler_view.setAdapter(userAdapter);
-                    Log.e("adapter ", "setted");
+                  //  Log.e("adapter ", "setted");
                 }
             }
 

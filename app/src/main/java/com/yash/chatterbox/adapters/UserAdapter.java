@@ -36,7 +36,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        Log.e("onCreateViewHolder","called");
+        //Log.e("onCreateViewHolder","called");
         LayoutInflater layoutInflater= LayoutInflater.from(mContext);
         View view= layoutInflater.inflate(R.layout.user_item,parent,false);
         return new UserAdapter.MyViewHolder(view);
@@ -45,9 +45,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position)
     {
-        Log.e("onBindViewHolder","called");
+       // Log.e("onBindViewHolder","called");
         final User user= userList.get(position);
-        Log.e("User",""+user.getId()+user.getUserName());
+        //Log.e("User",""+user.getId()+user.getUserName());
         holder.tv_userName.setText(user.getUserName());
         if (user.getImageUrl().equals("default"))
         {
@@ -98,7 +98,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
         public MyViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            Log.e("inside my view holder","called");
+            //Log.e("inside my view holder","called");
             tv_userName= itemView.findViewById(R.id.tv_userName);
             profile_image=itemView.findViewById(R.id.profile_image);
             img_on=itemView.findViewById(R.id.img_on);

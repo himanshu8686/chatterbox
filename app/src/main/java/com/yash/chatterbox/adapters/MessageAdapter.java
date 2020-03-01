@@ -58,6 +58,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MessageAdapter.MyViewHolder holder, int position)
     {
        Chat chat=chatList.get(position);
+        System.out.println("-------------------"+chat.isIsSeen()+chat.getMessage());
        holder.show_message.setText(chat.getMessage());
         if (imageUrl.equals("default"))
         {
@@ -65,6 +66,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
         }
         else {
             Glide.with(mContext).load(imageUrl).into(holder.profile_image);
+        }
+
+        Log.e("chatList size",""+chatList.size());
+        Log.e("position",""+position);
+
+        //check for last message
+        if (position==chatList.size()-1)
+        {
+
+            if (chat.isIsSeen()==true)
+            {
+                Log.e("isseen",""+chat.isIsSeen());
+                holder.tv_seen.setText("seen");
+            }
+            else {
+                Log.e("isseen",""+chat.isIsSeen());
+                holder.tv_seen.setText("Delivered");
+            }
+        }
+        else {
+            holder.tv_seen.setVisibility(View.GONE);
         }
     }
 
@@ -88,12 +110,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
 
         public TextView show_message;
         public CircleImageView profile_image;
+        public TextView tv_seen;
 
         public MyViewHolder(@NonNull View itemView)
         {
             super(itemView);
             show_message=itemView.findViewById(R.id.show_message);
             profile_image=itemView.findViewById(R.id.profile_image);
+            tv_seen=itemView.findViewById(R.id.tv_seen);
         }
     }
 }
