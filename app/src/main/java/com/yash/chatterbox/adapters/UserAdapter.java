@@ -103,7 +103,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>
             profile_image=itemView.findViewById(R.id.profile_image);
             img_on=itemView.findViewById(R.id.img_on);
             img_off=itemView.findViewById(R.id.img_off);
-
         }
     }
 }

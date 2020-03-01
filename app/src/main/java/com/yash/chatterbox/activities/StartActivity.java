@@ -252,7 +252,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                     FirebaseUser firebaseUser=firebaseAuth.getCurrentUser();
                     String userId=firebaseUser.getUid();
                     //we will store additional fields in firebase database
-                    User user=new User(userId,userName,"default","offline");
+                    User user=new User(userId,userName,"default","offline",userName.toLowerCase());
                     databaseReference= FirebaseDatabase.getInstance().getReference("Users").child(userId);
                     databaseReference.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
