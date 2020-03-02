@@ -49,7 +49,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private MessageAdapter messageAdapter;
     private List<Chat> chatList;
     private RecyclerView message_recycler_view;
-     ValueEventListener seenListener;
+    ValueEventListener seenListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -89,7 +89,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         databaseReference= FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
         showUserDetailOnToolbar();
-       seenMessage(userId);
+        seenMessage(userId);
 
 
     }
@@ -97,7 +97,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-     //   Log.e("onResumeOf Message Act","called");
+        //   Log.e("onResumeOf Message Act","called");
         status("online");
     }
 
@@ -194,7 +194,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 {
                     Chat chat=snapshot.getValue(Chat.class);
                     if (chat.getReceiver().equals(myId) && chat.getSender().equals(userId)
-                    || chat.getReceiver().equals(userId) && chat.getSender().equals(myId))
+                            || chat.getReceiver().equals(userId) && chat.getSender().equals(myId))
                     {
                         chatList.add(chat);
                     }
