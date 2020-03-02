@@ -135,6 +135,26 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         hashMap.put("message",message);
         hashMap.put("isSeen",false);
         reference.child("Chats").push().setValue(hashMap);
+
+        //add user to chat fragment
+        final DatabaseReference chatRef=FirebaseDatabase.getInstance().getReference("ChatList")
+                .child(firebaseUser.getUid())
+                .child(userId);
+
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists())
+                {
+                    chatRef.child("id").setValue(userId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void seenMessage(final String userId)
