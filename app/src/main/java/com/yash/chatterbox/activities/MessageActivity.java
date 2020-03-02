@@ -6,6 +6,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,9 +26,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.yash.chatterbox.Notifications.Client;
+import com.yash.chatterbox.Notifications.Data;
+import com.yash.chatterbox.Notifications.MyResponse;
+import com.yash.chatterbox.Notifications.Sender;
+import com.yash.chatterbox.Notifications.Token;
 import com.yash.chatterbox.R;
 import com.yash.chatterbox.adapters.MessageAdapter;
+import com.yash.chatterbox.fragments.APIService;
 import com.yash.chatterbox.model.Chat;
 import com.yash.chatterbox.model.User;
 
@@ -50,6 +60,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private List<Chat> chatList;
     private RecyclerView message_recycler_view;
     ValueEventListener seenListener;
+    APIService apiService;
+    boolean notify=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,6 +79,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
             }
         });
+
+        apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         message_recycler_view=findViewById(R.id.message_recycler_view);
         message_recycler_view.setHasFixedSize(true);
@@ -125,7 +139,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
-    private void sendMessage(String sender,String receiver,String message)
+    private void sendMessage(String sender, final String receiver, String message)
     {
         DatabaseReference reference=FirebaseDatabase.getInstance().getReference();
 
@@ -155,6 +169,68 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
+
+        // notification part
+        final String msg=message;
+        reference=FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user=dataSnapshot.getValue(User.class);
+                if (notify)
+                {
+                    sendNotification(receiver,user.getUserName(),msg);
+                }
+                notify=false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void sendNotification(String receiver, final String userName, final String msg)
+    {
+       DatabaseReference tokens= FirebaseDatabase.getInstance().getReference("Tokens");
+       Query query=tokens.orderByKey().equalTo(receiver);
+       query.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               for (DataSnapshot snapshot:dataSnapshot.getChildren())
+               {
+                   Token token=snapshot.getValue(Token.class);
+                   Data data =new Data(firebaseUser.getUid(),R.mipmap.ic_launcher,userName +":" +msg,"New Message",userId);
+
+                   Sender sender=new Sender(data,token.getToken());
+                   apiService.sendNotification(sender)
+                           .enqueue(new Callback<MyResponse>() {
+                               @Override
+                               public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                   if (response.code()==200)
+                                   {
+                                       if (response.body().success!=1)
+                                       {
+                                           Toast.makeText(MessageActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                       }
+                                   }
+                               }
+
+                               @Override
+                               public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                               }
+                           });
+               }
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+           }
+       });
+
     }
 
     private void seenMessage(final String userId)
@@ -215,6 +291,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         if (v==btn_send)
         {
+            notify=true;
             String message=text_send.getText().toString();
             if (!message.equalsIgnoreCase(""))
             {

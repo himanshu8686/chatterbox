@@ -74,7 +74,7 @@ public class ChatsFragment extends Fragment {
             }
         });
 
-        updateToken(FirebaseInstanceId.getInstance().getInstanceId().getResult().getToken());
+        updateToken(FirebaseInstanceId.getInstance().getToken());
         return view;
     }
 
@@ -108,6 +108,11 @@ public class ChatsFragment extends Fragment {
         });
     }
 
+
+    /**
+     * this method is for notification token
+     * @param token
+     */
     private void updateToken(String token)
     {
         DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference("Tokens");
