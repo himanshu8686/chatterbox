@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/user_itm_color"
     tools:context=".activities.MessageActivity">
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar_layout"
@@ -23,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="95"
-        android:background="#C2BEBE">
-
+        android:background="@drawable/chat_bg_img"
+        >
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/message_recycler_view"
             android:layout_width="match_parent"

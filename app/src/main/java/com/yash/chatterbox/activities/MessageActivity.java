@@ -201,7 +201,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                for (DataSnapshot snapshot:dataSnapshot.getChildren())
                {
                    Token token=snapshot.getValue(Token.class);
-                   Data data =new Data(firebaseUser.getUid(),R.mipmap.ic_launcher,userName +":" +msg,"New Message",userId);
+                   Data data =new Data(firebaseUser.getUid(),R.mipmap.ic_chatterbox,userName +":" +msg,"Chatterbox",userId);
 
                    Sender sender=new Sender(data,token.getToken());
                    apiService.sendNotification(sender)

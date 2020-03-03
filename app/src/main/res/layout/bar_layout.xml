@@ -16,7 +16,7 @@
         android:layout_height="35dp"
         android:src="@drawable/userphoto"
         app:civ_border_width="0.5dp"
-        app:civ_border_color="#FF000000"
+        app:civ_border_color="#fff"
         />
     <TextView
         android:id="@+id/tv_userName"

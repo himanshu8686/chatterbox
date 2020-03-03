@@ -1,9 +1,12 @@
 package com.yash.chatterbox.Notifications;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,13 +50,20 @@ public class MyFirebaseMessaging extends FirebaseMessagingService
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent=PendingIntent.getActivity(this,requestCode,intent,PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSound= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(this)
+        try {
+            Uri defaultSound= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone ringtone=RingtoneManager.getRingtone(getApplicationContext(), defaultSound);
+            ringtone.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Notification.Builder builder=new Notification.Builder(this)
                 .setSmallIcon(Integer.parseInt(icon))
                 .setContentTitle(title)
                 .setContentText(body)
+                .setLights(Color.BLUE, 500, 500)
+                .setVibrate(new long[] {0,500})
                 .setAutoCancel(true)
-                .setSound(defaultSound)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
