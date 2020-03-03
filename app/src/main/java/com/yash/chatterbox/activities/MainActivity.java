@@ -25,6 +25,7 @@ import com.yash.chatterbox.adapters.ViewPagerAdapter;
 import com.yash.chatterbox.fragments.ChatsFragment;
 import com.yash.chatterbox.fragments.ProfileFragment;
 import com.yash.chatterbox.fragments.UsersFragment;
+import com.yash.chatterbox.model.Chat;
 import com.yash.chatterbox.model.User;
 
 import java.util.HashMap;
@@ -55,22 +56,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setTitle("");
         showUserOnToolbar();
 
-        setUpViewPager();
+        databaseReference= FirebaseDatabase.getInstance().getReference("Chats");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+                int unRead=0;
+                for (DataSnapshot snapshot:dataSnapshot.getChildren())
+                {
+                    Chat chat=snapshot.getValue(Chat.class);
+                    if (chat.getReceiver().equals(firebaseUser.getUid()) && !chat.isIsSeen())
+                    {
+                        unRead++;
+                    }
+                }
+                if (unRead==0)
+                {
+                    viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
+                }
+                else {
 
+                    viewPagerAdapter.addFragment(new ChatsFragment(),"(" + unRead + ")Chats");
+                }
+                viewPagerAdapter.addFragment(new UsersFragment(),"Users");
+                viewPagerAdapter.addFragment(new ProfileFragment(),"Profile");
+                view_pager.setAdapter(viewPagerAdapter);
+                tab_layout.setupWithViewPager(view_pager);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+       // setUpViewPager();
     }
 
-    /**
-     * This setUpViewPager() method is user defined method for placing view pager adapter in view
-     */
-    private void setUpViewPager() {
-        viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
-        viewPagerAdapter.addFragment(new UsersFragment(),"Users");
-        viewPagerAdapter.addFragment(new ProfileFragment(),"Profile");
-        view_pager.setAdapter(viewPagerAdapter);
-        tab_layout.setupWithViewPager(view_pager);
-    }
+//    /**
+//     * This setUpViewPager() method is user defined method for placing view pager adapter in view
+//     */
+//    private void setUpViewPager() {
+//        viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+//        viewPagerAdapter.addFragment(new ChatsFragment(),"Chats");
+//        viewPagerAdapter.addFragment(new UsersFragment(),"Users");
+//        viewPagerAdapter.addFragment(new ProfileFragment(),"Profile");
+//        view_pager.setAdapter(viewPagerAdapter);
+//        tab_layout.setupWithViewPager(view_pager);
+//    }
 
     /**
      * This showUserOnToolbar() method is user defined method and is used for customizing on the toolbar

@@ -11,6 +11,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -113,6 +114,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         super.onResume();
         //   Log.e("onResumeOf Message Act","called");
         status("online");
+        currentUser(userId);
     }
 
     private void showUserDetailOnToolbar() {
@@ -303,6 +305,13 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    private void currentUser(String userId)
+    {
+        SharedPreferences.Editor editor=getSharedPreferences("PREFS",MODE_PRIVATE).edit();
+        editor.putString("currentuser",userId);
+        editor.apply();
+    }
+
     private void status(String status)
     {
         databaseReference=FirebaseDatabase.getInstance().getReference("Users")
@@ -319,5 +328,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         super.onPause();
         databaseReference.removeEventListener(seenListener);
         status("offline");
+        currentUser("none");
     }
 }
